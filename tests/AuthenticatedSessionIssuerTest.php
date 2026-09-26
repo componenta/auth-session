@@ -70,7 +70,7 @@ final class AuthenticatedSessionIssuerTest extends TestCase
     }
 }
 
-final readonly class IssuerIdentityFixture implements IdentityInterface
+final class IssuerIdentityFixture implements IdentityInterface
 {
     public UuidInterface $uuid {
         get => Uuid::fromString('018f6d5d-3f7a-7a9b-8c2f-123456789abd');
