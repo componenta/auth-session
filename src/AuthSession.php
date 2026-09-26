@@ -33,6 +33,7 @@ final readonly class AuthSession implements AuthenticationStateInterface
         public DateTimeImmutable $idleExpiresAt,
         public DateTimeImmutable $absoluteExpiresAt,
         array $metadata = [],
+        public ?AuthenticationEvidence $reauthenticationEvidence = null,
     ) {
         if ($this->credentialGeneration < 1) {
             throw new \InvalidArgumentException(
@@ -61,6 +62,15 @@ final readonly class AuthSession implements AuthenticationStateInterface
         ) {
             throw new \InvalidArgumentException(
                 'Reauthentication timestamp is inconsistent.',
+            );
+        }
+
+        if (
+            ($this->reauthenticatedAt === null)
+            !== ($this->reauthenticationEvidence === null)
+        ) {
+            throw new \InvalidArgumentException(
+                'Reauthentication timestamp and evidence must be present together.',
             );
         }
 

@@ -31,26 +31,51 @@ final readonly class AssuranceRequirement
         AuthSession $session,
         DateTimeImmutable $now,
     ): bool {
+        if ($this->maxAge === null) {
+            return $this->matches($session->evidence);
+        }
+
+        $cutoff = $now->modify(sprintf('-%d seconds', $this->maxAge));
+
+        if (
+            $session->authenticatedAt <= $now
+            && $session->authenticatedAt >= $cutoff
+            && (
+                $session->reauthenticatedAt === null
+                || $session->reauthenticatedAt <= $now
+            )
+        ) {
+            return $this->matches($session->evidence);
+        }
+
+        if (
+            $session->reauthenticatedAt !== null
+            && $session->reauthenticatedAt <= $now
+            && $session->reauthenticatedAt >= $cutoff
+            && $session->reauthenticationEvidence !== null
+        ) {
+            return $this->matches($session->reauthenticationEvidence);
+        }
+
+        return false;
+    }
+
+    private function matches(
+        \Componenta\Auth\AuthenticationEvidence $evidence,
+    ): bool {
         foreach ($this->requiredMethods as $method) {
-            if (!$session->evidence->hasMethod($method)) {
+            if (!$evidence->hasMethod($method)) {
                 return false;
             }
         }
 
         foreach ($this->requiredCapabilities as $capability) {
-            if (!$session->evidence->hasCapability($capability)) {
+            if (!$evidence->hasCapability($capability)) {
                 return false;
             }
         }
 
-        if ($this->maxAge === null) {
-            return true;
-        }
-
-        $establishedAt = $session->reauthenticatedAt ?? $session->authenticatedAt;
-
-        return $establishedAt <= $now
-            && $establishedAt >= $now->modify(sprintf('-%d seconds', $this->maxAge));
+        return true;
     }
 
     /** @param list<string> $identifiers */
