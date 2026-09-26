@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Componenta\Auth\Session;
 
 use Componenta\Auth\AuthenticationEvidence;
+use Componenta\Auth\AuthenticationStateInterface;
 use Componenta\Identity\UuidInterface;
 use DateTimeImmutable;
 
-final readonly class AuthSession
+final readonly class AuthSession implements AuthenticationStateInterface
 {
     private const int MAX_METADATA_ENTRIES = 32;
     private const int MAX_METADATA_KEY_LENGTH = 64;
