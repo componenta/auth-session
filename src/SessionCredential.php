@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Componenta\Auth\Session;
 
 /** Secret opaque bearer used to resume one authenticated session. */
-final readonly class SessionCredential implements \Stringable
+final readonly class SessionCredential implements \JsonSerializable
 {
     private const int RAW_BYTES = 32;
     private const int WIRE_LENGTH = 43;
@@ -47,11 +47,6 @@ final readonly class SessionCredential implements \Stringable
         return new self(rtrim(strtr(base64_encode($bytes), '+/', '-_'), '='));
     }
 
-    #[\Override]
-    public function __toString(): string
-    {
-        return $this->value;
-    }
 
     public function toString(): string
     {
@@ -62,5 +57,12 @@ final readonly class SessionCredential implements \Stringable
     public function __debugInfo(): array
     {
         return ['credential' => '[REDACTED]'];
+    }
+
+    /** @return array{credential: string} */
+    #[\Override]
+    public function jsonSerialize(): array
+    {
+        return $this->__debugInfo();
     }
 }

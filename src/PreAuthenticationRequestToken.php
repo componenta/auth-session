@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Componenta\Auth\Session;
 
-final readonly class PreAuthenticationRequestToken implements \Stringable
+final readonly class PreAuthenticationRequestToken implements \JsonSerializable
 {
     private const int RAW_BYTES = 32;
     private const int WIRE_LENGTH = 43;
@@ -48,11 +48,6 @@ final readonly class PreAuthenticationRequestToken implements \Stringable
         return new self(rtrim(strtr(base64_encode($bytes), '+/', '-_'), '='));
     }
 
-    #[\Override]
-    public function __toString(): string
-    {
-        return $this->value;
-    }
 
     public function toString(): string
     {
@@ -63,5 +58,12 @@ final readonly class PreAuthenticationRequestToken implements \Stringable
     public function __debugInfo(): array
     {
         return ['requestToken' => '[REDACTED]'];
+    }
+
+    /** @return array{requestToken: string} */
+    #[\Override]
+    public function jsonSerialize(): array
+    {
+        return $this->__debugInfo();
     }
 }

@@ -26,5 +26,15 @@ final class PreAuthenticationValueObjectsTest extends TestCase
             $requestToken->toString(),
             json_encode($requestToken->__debugInfo(), JSON_THROW_ON_ERROR),
         );
+        self::assertStringNotContainsString(
+            $credential->toString(),
+            json_encode($credential, JSON_THROW_ON_ERROR),
+        );
+        self::assertStringNotContainsString(
+            $requestToken->toString(),
+            json_encode($requestToken, JSON_THROW_ON_ERROR),
+        );
+        self::assertNotInstanceOf(\Stringable::class, $credential);
+        self::assertNotInstanceOf(\Stringable::class, $requestToken);
     }
 }

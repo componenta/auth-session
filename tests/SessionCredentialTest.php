@@ -32,5 +32,10 @@ final class SessionCredentialTest extends TestCase
             ['credential' => '[REDACTED]'],
             $credential->__debugInfo(),
         );
+        self::assertSame(
+            '{"credential":"[REDACTED]"}',
+            json_encode($credential, JSON_THROW_ON_ERROR),
+        );
+        self::assertNotInstanceOf(\Stringable::class, $credential);
     }
 }
