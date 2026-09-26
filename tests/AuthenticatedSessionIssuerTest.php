@@ -45,6 +45,54 @@ final class AuthenticatedSessionIssuerTest extends TestCase
         self::assertSame(['device' => 'Browser'], $manager->metadata);
     }
 
+    public function testReauthenticationUsesFreshProofAndPolicyForEffectiveEvidence(): void
+    {
+        $identity = new IssuerIdentityFixture();
+        $initialEvidence = new AuthenticationEvidence(
+            ['password'],
+            ['knowledge'],
+        );
+        $proof = new AuthenticationEvidence(
+            ['webauthn'],
+            ['phishing_resistant', 'user_verified'],
+        );
+        $policy = new AuthSessionPolicy(1800, 28800);
+        $session = self::grant(
+            $identity->uuid,
+            $initialEvidence,
+            $policy,
+        )->session;
+        $grant = self::grant(
+            $identity->uuid,
+            new AuthenticationEvidence(
+                ['password', 'webauthn'],
+                ['knowledge', 'phishing_resistant', 'user_verified'],
+            ),
+            $policy,
+        );
+        $manager = new RecordingManagerFixture($grant);
+        $policies = new RecordingPolicyFixture($policy);
+        $issuer = new AuthenticatedSessionIssuer($manager, $policies);
+
+        self::assertSame(
+            $grant,
+            $issuer->reauthenticate($session, $identity, $proof),
+        );
+        self::assertSame($session, $manager->observed);
+        self::assertSame($proof, $manager->evidence);
+        self::assertSame(RotationReason::Reauthentication, $manager->reason);
+        self::assertSame($policy, $manager->policy);
+        self::assertNotNull($policies->evidence);
+        self::assertSame(
+            ['password', 'webauthn'],
+            $policies->evidence->methods,
+        );
+        self::assertSame(
+            ['knowledge', 'phishing_resistant', 'user_verified'],
+            $policies->evidence->capabilities,
+        );
+    }
+
     private static function grant(
         UuidInterface $subjectId,
         AuthenticationEvidence $evidence,
@@ -82,6 +130,8 @@ final class RecordingManagerFixture implements AuthSessionManagerInterface
     public ?UuidInterface $subjectId = null;
     public ?AuthenticationEvidence $evidence = null;
     public ?AuthSessionPolicy $policy = null;
+    public ?AuthSession $observed = null;
+    public ?RotationReason $reason = null;
 
     /** @var array<string, scalar|null> */
     public array $metadata = [];
@@ -115,6 +165,11 @@ final class RecordingManagerFixture implements AuthSessionManagerInterface
         RotationReason $reason,
         ?AuthSessionPolicy $policy = null,
     ): AuthSessionGrant {
+        $this->observed = $observed;
+        $this->evidence = $evidence;
+        $this->reason = $reason;
+        $this->policy = $policy;
+
         return $this->grant;
     }
 
@@ -145,6 +200,23 @@ final readonly class FixedPolicyFixture implements AuthSessionPolicyProviderInte
         IdentityInterface $identity,
         AuthenticationEvidence $evidence,
     ): AuthSessionPolicy {
+        return $this->policy;
+    }
+}
+
+
+final class RecordingPolicyFixture implements AuthSessionPolicyProviderInterface
+{
+    public ?AuthenticationEvidence $evidence = null;
+
+    public function __construct(private AuthSessionPolicy $policy) {}
+
+    public function for(
+        IdentityInterface $identity,
+        AuthenticationEvidence $evidence,
+    ): AuthSessionPolicy {
+        $this->evidence = $evidence;
+
         return $this->policy;
     }
 }
