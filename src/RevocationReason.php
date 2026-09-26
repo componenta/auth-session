@@ -12,5 +12,6 @@ enum RevocationReason: string
     case AccountDisabled = 'account_disabled';
     case CredentialCompromise = 'credential_compromise';
     case Superseded = 'superseded';
+    case Expired = 'expired';
     case SecurityEvent = 'security_event';
 }
