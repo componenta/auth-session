@@ -14,8 +14,11 @@ final readonly class AuthSession
     private const int MAX_METADATA_KEY_LENGTH = 64;
     private const int MAX_METADATA_STRING_LENGTH = 1024;
 
+    /** @var array<string, scalar|null> */
+    public array $metadata;
+
     /**
-     * @param array<string, scalar|null> $metadata
+     * @param array<string, mixed> $metadata
      */
     public function __construct(
         public UuidInterface $uuid,
@@ -28,7 +31,7 @@ final readonly class AuthSession
         public DateTimeImmutable $lastActiveAt,
         public DateTimeImmutable $idleExpiresAt,
         public DateTimeImmutable $absoluteExpiresAt,
-        public array $metadata = [],
+        array $metadata = [],
     ) {
         if ($this->credentialGeneration < 1) {
             throw new \InvalidArgumentException(
@@ -60,10 +63,13 @@ final readonly class AuthSession
             );
         }
 
-        self::assertMetadata($this->metadata);
+        self::assertMetadata($metadata);
+
+        /** @var array<string, scalar|null> $metadata */
+        $this->metadata = $metadata;
     }
 
-    /** @param array<string, scalar|null> $metadata */
+    /** @param array<string, mixed> $metadata */
     private static function assertMetadata(array $metadata): void
     {
         if (count($metadata) > self::MAX_METADATA_ENTRIES) {
