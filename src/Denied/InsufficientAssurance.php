@@ -6,7 +6,7 @@ namespace Componenta\Auth\Session\Denied;
 
 use Componenta\Auth\DeniedReasonInterface;
 
-final readonly class InsufficientAssurance implements DeniedReasonInterface
+final class InsufficientAssurance implements DeniedReasonInterface
 {
     public string $code {
         get => 'insufficient_assurance';
