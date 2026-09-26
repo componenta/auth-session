@@ -8,6 +8,5 @@ on `componenta/session`, HTTP, cookies, Cycle ORM or a database implementation.
 Related packages:
 
 - `componenta/auth-session-database` — persistent storage.
-- `componenta/auth-session-http` — browser/HTTP transport and middleware.
+- `componenta/auth-session-http` — browser/HTTP transport, middleware and session-bound CSRF.
 - `componenta/auth-session-app` — Componenta DI parameter integration.
-- `componenta/auth-session-csrf` — authentication-session-bound CSRF.
