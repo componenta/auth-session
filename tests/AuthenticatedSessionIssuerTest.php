@@ -128,6 +128,7 @@ final class RecordingManagerFixture implements AuthSessionManagerInterface
     public function revokeAll(
         UuidInterface $subjectId,
         ?UuidInterface $exceptSessionId = null,
+        RevocationReason $reason = RevocationReason::UserRequested,
     ): void {}
 
     public function isGrantCurrent(AuthSessionGrant $grant): bool
