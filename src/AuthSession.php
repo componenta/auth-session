@@ -26,7 +26,6 @@ final readonly class AuthSession implements AuthenticationStateInterface
         public UuidInterface $subjectId,
         public AuthenticationEvidence $evidence,
         public int $credentialGeneration,
-        public DateTimeImmutable $createdAt,
         public DateTimeImmutable $authenticatedAt,
         public ?DateTimeImmutable $reauthenticatedAt,
         public DateTimeImmutable $lastActiveAt,
@@ -42,8 +41,7 @@ final readonly class AuthSession implements AuthenticationStateInterface
         }
 
         if (
-            $this->authenticatedAt < $this->createdAt
-            || $this->lastActiveAt < $this->authenticatedAt
+            $this->lastActiveAt < $this->authenticatedAt
             || $this->idleExpiresAt <= $this->lastActiveAt
             || $this->absoluteExpiresAt <= $this->authenticatedAt
             || $this->idleExpiresAt > $this->absoluteExpiresAt

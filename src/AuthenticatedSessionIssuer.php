@@ -64,29 +64,13 @@ final readonly class AuthenticatedSessionIssuer
             return $identity;
         }
 
-        $effective = self::mergeEvidence($session->evidence, $proof);
+        $effective = $session->evidence->merge($proof);
 
         return $this->manager->rotate(
             $session,
             $proof,
             RotationReason::Reauthentication,
             $this->policies->for($identity, $effective),
-        );
-    }
-
-    private static function mergeEvidence(
-        AuthenticationEvidence $current,
-        AuthenticationEvidence $proof,
-    ): AuthenticationEvidence {
-        return new AuthenticationEvidence(
-            methods: array_values(array_unique([
-                ...$current->methods,
-                ...$proof->methods,
-            ])),
-            capabilities: array_values(array_unique([
-                ...$current->capabilities,
-                ...$proof->capabilities,
-            ])),
         );
     }
 }

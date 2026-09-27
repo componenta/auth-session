@@ -24,8 +24,18 @@ interface AuthSessionManagerInterface
         SessionCredential $credential,
     ): ?AuthSession;
 
+    /**
+     * Updates activity only while the observed generation and activity time are
+     * still current. Never revives an expired, revoked, or replaced session.
+     */
     public function touch(AuthSession $observed): void;
 
+    /**
+     * Atomically replaces the bearer while preserving uuid and authenticatedAt.
+     * Reauthentication requires a policy and records the supplied fresh proof
+     * separately from cumulative evidence. A concurrent generation change fails
+     * with ConcurrentSessionRotationException.
+     */
     public function rotate(
         AuthSession $observed,
         AuthenticationEvidence $evidence,
@@ -50,5 +60,6 @@ interface AuthSessionManagerInterface
         RevocationReason $reason = RevocationReason::UserRequested,
     ): void;
 
+    /** Checks active state, generation, and credential before bearer publication. */
     public function isGrantCurrent(AuthSessionGrant $grant): bool;
 }

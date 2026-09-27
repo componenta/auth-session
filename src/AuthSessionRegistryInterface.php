@@ -6,6 +6,7 @@ namespace Componenta\Auth\Session;
 
 use Componenta\Identity\UuidInterface;
 
+/** Reads active sessions by public identity; never authenticates a bearer. */
 interface AuthSessionRegistryInterface
 {
     public function find(UuidInterface $sessionId): ?AuthSession;

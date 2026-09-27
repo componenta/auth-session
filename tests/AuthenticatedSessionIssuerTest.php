@@ -117,7 +117,6 @@ final class AuthenticatedSessionIssuerTest extends TestCase
                 $evidence,
                 1,
                 $now,
-                $now,
                 null,
                 $now,
                 $now->modify(sprintf('+%d seconds', $policy->idleTimeout)),

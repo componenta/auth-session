@@ -5,10 +5,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "componenta/auth": "dev-auth-3",
-        "componenta/clock": "^1.1.0",
-        "componenta/identity": "^1.0",
-        "psr/clock": "^1.0"
+        "componenta/auth": "^3.0",
+        "componenta/identity": "^1.0.1"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.1",
@@ -30,7 +28,7 @@
             "url": "https://github.com/componenta/auth.git"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "extra": {
         "branch-alias": {

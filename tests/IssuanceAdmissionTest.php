@@ -40,7 +40,7 @@ final class IssuanceAdmissionTest extends TestCase
         $issuer = new AuthenticatedSessionIssuer($manager, $policies, new AuthenticationAdmission($provider, $guard));
         $proof = new AuthenticationEvidence(['webauthn']);
         $now = new \DateTimeImmutable('2030-01-01T00:00:00+00:00');
-        $session = new AuthSession((new UuidFactory())->generate(), $identity->uuid, new AuthenticationEvidence(['password']), 1, $now, $now, null, $now, $now->modify('+1 hour'), $now->modify('+8 hours'));
+        $session = new AuthSession((new UuidFactory())->generate(), $identity->uuid, new AuthenticationEvidence(['password']), 1, $now, null, $now, $now->modify('+1 hour'), $now->modify('+8 hours'));
         $result = $reauthenticate ? $issuer->reauthenticate($session, $identity, $proof) : $issuer->issue($identity, $proof);
         self::assertSame($denial, $result);
     }

@@ -99,7 +99,6 @@ final class AuthSessionTest extends TestCase
             subjectId: Uuid::fromString('018f6d5d-3f7a-7a9b-8c2f-123456789abd'),
             evidence: $evidence,
             credentialGeneration: 1,
-            createdAt: $created,
             authenticatedAt: $created,
             reauthenticatedAt: $reauthenticatedAt,
             lastActiveAt: $lastActive,
