@@ -32,6 +32,7 @@ final class AuthenticatedSessionIssuerTest extends TestCase
         $issuer = new AuthenticatedSessionIssuer(
             $manager,
             new FixedPolicyFixture($policy),
+            $this->admission($identity),
         );
 
         self::assertSame(
@@ -72,7 +73,7 @@ final class AuthenticatedSessionIssuerTest extends TestCase
         );
         $manager = new RecordingManagerFixture($grant);
         $policies = new RecordingPolicyFixture($policy);
-        $issuer = new AuthenticatedSessionIssuer($manager, $policies);
+        $issuer = new AuthenticatedSessionIssuer($manager, $policies, $this->admission($identity));
 
         self::assertSame(
             $grant,
@@ -91,6 +92,15 @@ final class AuthenticatedSessionIssuerTest extends TestCase
             ['knowledge', 'phishing_resistant', 'user_verified'],
             $policies->evidence->capabilities,
         );
+    }
+
+    private function admission(IdentityInterface $identity): \Componenta\Auth\AuthenticationAdmission
+    {
+        $provider = $this->createStub(\Componenta\Auth\IdentityProviderInterface::class);
+        $provider->method('findByUuid')->willReturn($identity);
+        $guard = $this->createStub(\Componenta\Auth\AuthenticationGuardInterface::class);
+        $guard->method('check')->willReturn(null);
+        return new \Componenta\Auth\AuthenticationAdmission($provider, $guard);
     }
 
     private static function grant(
