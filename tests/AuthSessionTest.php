@@ -74,6 +74,33 @@ final class AuthSessionTest extends TestCase
         ));
     }
 
+    public function testFreshHistoricalProofCannotRestoreRemovedCurrentAssurance(): void
+    {
+        $proof = new AuthenticationEvidence(['webauthn'], ['phishing_resistant']);
+        $reauthenticatedAt = new DateTimeImmutable('2030-01-01T00:09:00+00:00');
+        // Privilege-change rotation may replace current evidence while keeping
+        // the earlier reauthentication timestamp and proof for history.
+        $changed = self::session(
+            new AuthenticationEvidence(['password'], ['knowledge']),
+            reauthenticatedAt: $reauthenticatedAt,
+            reauthenticationEvidence: $proof,
+        );
+        $retained = self::session(
+            new AuthenticationEvidence(['password', 'webauthn'], ['knowledge', 'phishing_resistant']),
+            reauthenticatedAt: $reauthenticatedAt,
+            reauthenticationEvidence: $proof,
+        );
+        $now = new DateTimeImmutable('2030-01-01T00:10:00+00:00');
+
+        foreach ([
+            new AssuranceRequirement(requiredMethods: ['webauthn'], maxAge: 120),
+            new AssuranceRequirement(requiredCapabilities: ['phishing_resistant'], maxAge: 120),
+        ] as $requirement) {
+            self::assertFalse($requirement->isSatisfiedBy($changed, $now));
+            self::assertTrue($requirement->isSatisfiedBy($retained, $now));
+        }
+    }
+
     public function testRejectsSecretMetadataKeys(): void
     {
         $this->expectException(\InvalidArgumentException::class);

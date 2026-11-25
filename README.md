@@ -18,6 +18,13 @@ unchanged during credential rotation or reauthentication. `reauthenticatedAt`
 and `reauthenticationEvidence` describe the latest fresh proof; `evidence`
 describes the cumulative authentication evidence.
 
+Assurance requirements always check the current `evidence` first. When `maxAge`
+is set, the initial login or latest reauthentication proof must also establish
+freshness for those methods and capabilities. A privilege-change rotation can
+replace current evidence while preserving the historical reauthentication
+proof; that historical proof cannot restore a method or capability removed
+from current evidence.
+
 The redundant `createdAt` constructor argument and property have been removed.
 Update named calls by removing `createdAt:` and positional calls by removing the
 timestamp immediately before `authenticatedAt`. Pre-authentication transactions

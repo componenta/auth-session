@@ -37,8 +37,12 @@ final readonly class AssuranceRequirement
         AuthSession $session,
         DateTimeImmutable $now,
     ): bool {
+        if (!$this->matches($session->evidence)) {
+            return false;
+        }
+
         if ($this->maxAge === null) {
-            return $this->matches($session->evidence);
+            return true;
         }
 
         $cutoff = $now->modify(sprintf('-%d seconds', $this->maxAge));
@@ -51,7 +55,7 @@ final readonly class AssuranceRequirement
                 || $session->reauthenticatedAt <= $now
             )
         ) {
-            return $this->matches($session->evidence);
+            return true;
         }
 
         if (
