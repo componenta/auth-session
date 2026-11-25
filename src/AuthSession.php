@@ -72,18 +72,20 @@ final readonly class AuthSession implements AuthenticationStateInterface
             );
         }
 
-        self::assertMetadata($metadata);
-
-        /** @var array<string, scalar|null> $metadata */
-        $this->metadata = $metadata;
+        $this->metadata = self::copyMetadata($metadata);
     }
 
-    /** @param array<string, mixed> $metadata */
-    private static function assertMetadata(array $metadata): void
+    /**
+     * @param array<string, mixed> $metadata
+     * @return array<string, scalar|null>
+     */
+    private static function copyMetadata(array $metadata): array
     {
         if (count($metadata) > self::MAX_METADATA_ENTRIES) {
             throw new \InvalidArgumentException('Too many session metadata entries.');
         }
+
+        $copy = [];
 
         foreach ($metadata as $key => $value) {
             if (
@@ -117,6 +119,11 @@ final readonly class AuthSession implements AuthenticationStateInterface
             ) {
                 throw new \InvalidArgumentException('Session metadata value is invalid.');
             }
+
+            // Copy scalar values so caller references cannot change validated state.
+            $copy[$key] = $value;
         }
+
+        return $copy;
     }
 }

@@ -101,6 +101,21 @@ final class AuthSessionTest extends TestCase
         ));
     }
 
+    public function testMetadataRetainsValidatedValuesAfterCallerReferencesChange(): void
+    {
+        $device = 'Browser';
+        $remembered = false;
+        $session = self::session(
+            new AuthenticationEvidence(['password']),
+            metadata: ['device' => &$device, 'remembered' => &$remembered],
+        );
+
+        $device = new \stdClass();
+        $remembered = true;
+
+        self::assertSame(['device' => 'Browser', 'remembered' => false], $session->metadata);
+    }
+
     public function testAssuranceCapabilitiesAreAnOwnedSnapshotOfThePolicy(): void
     {
         $capability = 'phishing_resistant';
