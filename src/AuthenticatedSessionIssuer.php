@@ -18,7 +18,7 @@ final readonly class AuthenticatedSessionIssuer
     ) {}
 
     /**
-     * @param array<string, scalar|null> $metadata
+     * @param array<array-key, scalar|null> $metadata
      */
     public function issue(
         IdentityInterface $identity,

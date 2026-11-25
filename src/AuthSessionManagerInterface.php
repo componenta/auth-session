@@ -10,7 +10,7 @@ use Componenta\Identity\UuidInterface;
 interface AuthSessionManagerInterface
 {
     /**
-     * @param array<string, scalar|null> $metadata
+     * @param array<array-key, scalar|null> $metadata
      */
     public function create(
         UuidInterface $subjectId,

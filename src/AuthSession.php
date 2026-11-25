@@ -15,11 +15,11 @@ final readonly class AuthSession implements AuthenticationStateInterface
     private const int MAX_METADATA_KEY_LENGTH = 64;
     private const int MAX_METADATA_STRING_LENGTH = 1024;
 
-    /** @var array<string, scalar|null> */
+    /** @var array<array-key, scalar|null> */
     public array $metadata;
 
     /**
-     * @param array<string, mixed> $metadata
+     * @param array<array-key, mixed> $metadata
      */
     public function __construct(
         public UuidInterface $uuid,
@@ -76,8 +76,8 @@ final readonly class AuthSession implements AuthenticationStateInterface
     }
 
     /**
-     * @param array<string, mixed> $metadata
-     * @return array<string, scalar|null>
+     * @param array<array-key, mixed> $metadata
+     * @return array<array-key, scalar|null>
      */
     private static function copyMetadata(array $metadata): array
     {
@@ -88,16 +88,18 @@ final readonly class AuthSession implements AuthenticationStateInterface
         $copy = [];
 
         foreach ($metadata as $key => $value) {
+            $name = (string) $key;
+
             if (
-                $key === ''
-                || strlen($key) > self::MAX_METADATA_KEY_LENGTH
-                || preg_match('/\A[a-zA-Z0-9][a-zA-Z0-9._-]*\z/D', $key) !== 1
+                $name === ''
+                || strlen($name) > self::MAX_METADATA_KEY_LENGTH
+                || preg_match('/\A[a-zA-Z0-9][a-zA-Z0-9._-]*\z/D', $name) !== 1
             ) {
                 throw new \InvalidArgumentException('Session metadata key is invalid.');
             }
 
             if (
-                preg_match('/(?:credential|token|secret|password|otp|csrf)/i', $key) === 1
+                preg_match('/(?:credential|token|secret|password|otp|csrf)/i', $name) === 1
             ) {
                 throw new \InvalidArgumentException(
                     'Session metadata cannot contain secret-bearing fields.',

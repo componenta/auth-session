@@ -143,6 +143,20 @@ final class AuthSessionTest extends TestCase
         self::assertSame(['device' => 'Browser', 'remembered' => false], $session->metadata);
     }
 
+    public function testNumericMetadataNamesKeepTheirPhpArrayIdentity(): void
+    {
+        $metadata = ['0' => 'zero', '42' => 'numeric', '001' => 'leading zero', 'device' => 'Browser'];
+        $session = self::session(
+            new AuthenticationEvidence(['password']),
+            metadata: $metadata,
+        );
+
+        self::assertSame($metadata, $session->metadata);
+        self::assertSame('zero', $session->metadata['0']);
+        self::assertSame('numeric', $session->metadata['42']);
+        self::assertSame('leading zero', $session->metadata['001']);
+    }
+
     public function testAssuranceCapabilitiesAreAnOwnedSnapshotOfThePolicy(): void
     {
         $capability = 'phishing_resistant';
@@ -160,7 +174,7 @@ final class AuthSessionTest extends TestCase
         ));
     }
 
-    /** @param array<string, scalar|null> $metadata */
+    /** @param array<array-key, scalar|null> $metadata */
     private static function session(
         AuthenticationEvidence $evidence,
         ?DateTimeImmutable $reauthenticatedAt = null,

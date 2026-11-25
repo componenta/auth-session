@@ -29,3 +29,10 @@ The redundant `createdAt` constructor argument and property have been removed.
 Update named calls by removing `createdAt:` and positional calls by removing the
 timestamp immediately before `authenticatedAt`. Pre-authentication transactions
 still have their own `createdAt`, because they exist before authentication.
+
+## Session metadata
+
+Metadata stores bounded scalar or null values under validated names. Numeric
+names such as `'0'` and `'42'` follow PHP's integer array-key normalization;
+their identity is preserved during persistence. Names with leading zeros such
+as `'001'` remain distinct string keys.
