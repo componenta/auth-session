@@ -8,13 +8,19 @@ use DateTimeImmutable;
 
 final readonly class AssuranceRequirement
 {
+    /** @var list<string> */
+    public array $requiredMethods;
+
+    /** @var list<string> */
+    public array $requiredCapabilities;
+
     /**
      * @param list<string> $requiredMethods
      * @param list<string> $requiredCapabilities
      */
     public function __construct(
-        public array $requiredMethods = [],
-        public array $requiredCapabilities = [],
+        array $requiredMethods = [],
+        array $requiredCapabilities = [],
         public ?int $maxAge = null,
     ) {
         if ($this->maxAge !== null && $this->maxAge < 0) {
@@ -23,8 +29,8 @@ final readonly class AssuranceRequirement
             );
         }
 
-        self::assertIdentifiers($this->requiredMethods);
-        self::assertIdentifiers($this->requiredCapabilities);
+        $this->requiredMethods = self::copyIdentifiers($requiredMethods);
+        $this->requiredCapabilities = self::copyIdentifiers($requiredCapabilities);
     }
 
     public function isSatisfiedBy(
@@ -78,9 +84,14 @@ final readonly class AssuranceRequirement
         return true;
     }
 
-    /** @param list<string> $identifiers */
-    private static function assertIdentifiers(array $identifiers): void
+    /**
+     * @param list<string> $identifiers
+     * @return list<string>
+     */
+    private static function copyIdentifiers(array $identifiers): array
     {
+        $copy = [];
+
         foreach ($identifiers as $identifier) {
             if (
                 $identifier === ''
@@ -91,6 +102,11 @@ final readonly class AssuranceRequirement
                     'Assurance identifier is invalid.',
                 );
             }
+
+            // A readonly array must not retain caller-owned reference elements.
+            $copy[] = $identifier;
         }
+
+        return $copy;
     }
 }

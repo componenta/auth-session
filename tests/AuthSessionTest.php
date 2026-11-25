@@ -84,6 +84,40 @@ final class AuthSessionTest extends TestCase
         );
     }
 
+    public function testAssuranceMethodsAreAnOwnedSnapshotOfThePolicy(): void
+    {
+        $method = 'webauthn';
+        $requirement = new AssuranceRequirement(requiredMethods: [&$method]);
+        $method = 'password';
+        $now = new DateTimeImmutable('2030-01-01T00:10:00+00:00');
+
+        self::assertTrue($requirement->isSatisfiedBy(
+            self::session(new AuthenticationEvidence(['webauthn'])),
+            $now,
+        ));
+        self::assertFalse($requirement->isSatisfiedBy(
+            self::session(new AuthenticationEvidence(['password'])),
+            $now,
+        ));
+    }
+
+    public function testAssuranceCapabilitiesAreAnOwnedSnapshotOfThePolicy(): void
+    {
+        $capability = 'phishing_resistant';
+        $requirement = new AssuranceRequirement(requiredCapabilities: [&$capability]);
+        $capability = 'knowledge';
+        $now = new DateTimeImmutable('2030-01-01T00:10:00+00:00');
+
+        self::assertTrue($requirement->isSatisfiedBy(
+            self::session(new AuthenticationEvidence(['webauthn'], ['phishing_resistant'])),
+            $now,
+        ));
+        self::assertFalse($requirement->isSatisfiedBy(
+            self::session(new AuthenticationEvidence(['password'], ['knowledge'])),
+            $now,
+        ));
+    }
+
     /** @param array<string, scalar|null> $metadata */
     private static function session(
         AuthenticationEvidence $evidence,
