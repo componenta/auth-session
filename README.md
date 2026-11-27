@@ -1,6 +1,8 @@
 # Componenta Auth Session
 
-Authentication-session contracts and lifecycle for Componenta Auth 3.
+Authentication-session contracts and lifecycle for Componenta Auth 4.
+
+Version 2 requires `componenta/auth ^4.0.0` and `componenta/identity ^1.1.1`.
 
 This package owns the logical authenticated session model. It does not depend
 on `componenta/session`, HTTP, cookies, Cycle ORM or a database implementation.
@@ -25,10 +27,11 @@ replace current evidence while preserving the historical reauthentication
 proof; that historical proof cannot restore a method or capability removed
 from current evidence.
 
-The redundant `createdAt` constructor argument and property have been removed.
-Update named calls by removing `createdAt:` and positional calls by removing the
-timestamp immediately before `authenticatedAt`. Pre-authentication transactions
-still have their own `createdAt`, because they exist before authentication.
+The session model has no `createdAt` property or constructor argument. When
+migrating from a pre-1.0 development snapshot, remove `createdAt:` from named
+calls and the timestamp immediately before `authenticatedAt` from positional
+calls. Pre-authentication transactions still have their own `createdAt`, because
+they exist before authentication.
 
 ## Session metadata
 
